@@ -3,12 +3,22 @@ package com.example.gestion_citas;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Paciente_view extends AppCompatActivity {
     private EditText id;
@@ -20,6 +30,8 @@ public class Paciente_view extends AppCompatActivity {
     private Spinner regimen;
     private Button btnRegistrar;
     private ModeloPaciente paciente;
+    private File file;
+    private String file_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,8 @@ public class Paciente_view extends AppCompatActivity {
                 paciente.setTipoAfiliacion(aficiliacion.getSelectedItem().toString());
                 paciente.setRegimen(regimen.getSelectedItem().toString());
                 Toast.makeText(Paciente_view.this, "Usuario registrado", Toast.LENGTH_LONG).show();
+                saveData();
+                readData();
             }
         });
 
@@ -54,6 +68,8 @@ public class Paciente_view extends AppCompatActivity {
         btnRegistrar = (Button) findViewById(R.id.btnRegistrarPac);
         paciente = new ModeloPaciente();
         opciones_spinner();
+        file_name = "datosArchivo.json";
+        file = new File(this.getFilesDir(), file_name);
     }
 
     private void opciones_spinner() {
@@ -71,6 +87,43 @@ public class Paciente_view extends AppCompatActivity {
         array_adapter = new ArrayAdapter<>(Paciente_view.this,
                 android.R.layout.simple_spinner_item, array_aficialiacion);
         regimen.setAdapter(array_adapter);
+    }
+
+    private void saveData() {
+        FileWriter fileWriter = null;
+        BufferedWriter bufferedWriter = null;
+        try {
+            file.createNewFile();
+            fileWriter = new FileWriter(file.getAbsoluteFile());
+            bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write("{'nombre':'" + paciente.getNombre() + "', 'apellido':'Porras', 'edad':29}");
+            bufferedWriter.close();
+            Toast.makeText(this, "Datos guardados", Toast.LENGTH_LONG).show();
+        }
+        catch (IOException err) {
+            Log.e("MyTag", err.toString());
+        }
+    }
+    private  void readData() {
+        FileReader fileReader = null;
+        BufferedReader bufferReader = null;
+        try {
+            fileReader = new FileReader(file.getAbsoluteFile());
+            bufferReader = new BufferedReader(fileReader);
+            String line;
+            String datos = "";
+            while((line = bufferReader.readLine()) != null) {
+                datos += line + " ";
+            }
+            bufferReader.close();
+            JSONObject objJson = new JSONObject(datos);
+            Log.i("MyTag", datos);
+            Log.i("MyTag", objJson.getString("nombre") + " " +
+                    objJson.getString("apellido") + " " + objJson.getInt("edad"));
+        }
+        catch (Exception err) {
+            Log.e("MyTag", err.toString());
+        }
     }
 
 }
