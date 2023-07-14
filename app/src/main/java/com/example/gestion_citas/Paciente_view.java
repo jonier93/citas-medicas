@@ -120,7 +120,6 @@ public class Paciente_view extends AppCompatActivity {
             Log.i("MyTag", datos);
             Log.i("MyTag", objJson.getString("nombre") + " " +
                     objJson.getString("apellido") + " " + objJson.getInt("edad"));
-
         }
         catch (Exception err) {
             Log.e("MyTag", err.toString());
